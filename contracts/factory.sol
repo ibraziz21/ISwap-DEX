@@ -4,6 +4,9 @@ pragma solidity 0.8.17;
 contract factory {
     error ZeroAddress();
     error SameToken();
+    error Unauthorized();
+    error PairExists();
+
     event pairCreated(
         address indexed tkn1,
         address indexed tkn2,
@@ -36,5 +39,14 @@ contract factory {
             : (tokenB, tokenA);
         if(getPair[token0][tokenA]!=address(0)) revert PairExists();
         //create the pool pair  
+
+    }
+    function setFeeTo(address _feeTo) external{
+        if(msg.sender!=feeToSetter) revert Unauthorized();
+        feeTo = _feeTo;
+    }
+    function changeFeeToSetter(address _feeToSetter)external{
+        if(msg.sender!=feeToSetter) revert Unauthorized();
+        feeToSetter = _feeToSetter;
     }
 }

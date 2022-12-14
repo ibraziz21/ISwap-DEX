@@ -39,7 +39,16 @@ contract factory {
             : (tokenB, tokenA);
         if(getPair[token0][tokenA]!=address(0)) revert PairExists();
         //create the pool pair  
+        bytes memory bytecode = type(Pair).creationCode;
+        bytes32 salt = keccak256(abi.encode(token0,token1));
+        assembly {
+          pair:=  create2(0,add(bytecode,32), mload(bytecode),salt)
+        }
+        IPair(pair).initialize(token0,token1);
+        getPair[token0][token1] = pair;
+        getPair[token1][token0] = pair;
 
+    pairs.push(pair);
     }
     function setFeeTo(address _feeTo) external{
         if(msg.sender!=feeToSetter) revert Unauthorized();
